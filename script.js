@@ -1,3 +1,5 @@
+let currentSong = new Audio();
+
 async function getSongs(){
     try{
         let songslist = await fetch("http://127.0.0.1:5500/songs");
@@ -32,8 +34,8 @@ async function main(){
             `<li>
                 <img class="invert" src="images/songicon.svg" alt="">
                 <div class="songDetails">
-                    <div>${(song.split("/songs/")[1]).replaceAll("%20", " ")}</div>
-                    <div>AlberTesla</div>
+                    <div class="songName">${(song.split("/songs/")[1]).replaceAll("%20", " ")}</div>
+                    <div class="songArtist">AlberTesla</div>
                 </div>
                 <div class="playSongList">
                     <div class="playSongText">Play Song</div>
@@ -44,14 +46,46 @@ async function main(){
 
         cardList.innerHTML = string;
 
-        // listElement.innerHTML = songCardTemplate.text;
+        let songList = cardList.querySelectorAll("li");
 
-        // var audio = new Audio(songs[0]);
-        // audio.volume = .05;
-        // console.log(songs);
-        // audio.addEventListener("loadeddata", function(event){
-        //     console.log(audio.duration);
-        // });
+        currentSong.volume = .1;
+        
+        songList.forEach(function(song){
+            let songName = song.querySelector(".songName").innerText;
+            song.addEventListener("click", function(event){
+                
+                let songPath = "/songs/" + songName;
+                
+                songPath = encodeURI(songPath);
+                console.log(songPath);
+                console.log("current song : ", currentSong.currentSrc);
+
+                if (currentSong.currentSrc === ""){
+                    console.log("song not there");
+                    currentSong.src = songPath;
+                    currentSong.volume = .1;
+                    currentSong.play();
+                }
+                else {
+                    let currentSongSplit = "/songs/" + currentSong.currentSrc.split("/songs/")[1];
+                    if (currentSongSplit === songPath) {
+                        if (currentSong.paused) {
+                            currentSong.volume = .1;
+                            currentSong.play();
+                        }
+                        else {
+                            currentSong.volume = .1;
+                            currentSong.pause();
+                        }
+                    }
+                    else {
+                        currentSong.src = songPath;
+                        currentSong.volume = .1;
+                        currentSong.play();
+                    }
+                }
+            });
+        });
     }
     catch(err){
         console.log(err);

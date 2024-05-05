@@ -207,20 +207,6 @@ body {
     font-size: 15px;
 }
 
-.playbar {
-    color: white;
-    position: absolute;
-    bottom: 0;
-    background-color: rgb(213, 218, 213);
-    width : 96%;
-    padding : 12px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    border-radius: 5px;
-    margin-bottom: 7px;
-}
-
 .songButtons {
     display: flex;
     flex-direction: row;
@@ -269,4 +255,56 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start
+}
+
+.seekbar {
+    width: 98%;
+    margin-bottom: 1px;
+    position : relative;
+    border: none;
+    height: 3px;
+    border-radius: 3px;
+    background-color: rgb(255, 255, 255);
+}
+
+.playbarBox {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    border-radius: 20px;
+    width: 98%;
+    bottom: 0;
+    border: 2px solid white;
+    background-color: rgb(49 51 49);
+}
+
+.playbar {
+    justify-content: space-between;
+    color: white;
+    width: 100%;
+    bottom: 30px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 7px;
+}
+
+.songInfo {
+    margin-left: 10px;
+}
+
+.songTime {
+    margin-right: 10px;
+}
+
+.seekCircle {
+    background-color: rgb(0, 0, 0);
+    height: 12px;
+    border-radius: 6px;
+    width: 12px;
+    position: absolute;
+    z-index: 1000;
+    left: 0%;
+    top: -5px;
 }

@@ -47,24 +47,54 @@ async function main(){
         cardList.innerHTML = string;
 
         let songList = cardList.querySelectorAll("li");
-
-        currentSong.volume = .1;
         
+        let songInfoElement = window.document.querySelector(".songInfo");
+        let songTimeElement = window.document.querySelector(".songTime");
+        let seekBarElement = window.document.querySelector(".seekbar");
+        let seekCircleElement = window.document.querySelector(".seekCircle");
+
+
+        seekBarElement.addEventListener("click", function(event){
+            let percent = (event.offsetX/seekBarElement.offsetWidth)*100;
+            seekCircleElement.style.left = percent + "%";
+
+            if (currentSong.currentSrc !== ""){
+                let seekTime = currentSong.duration*percent/100;
+                currentSong.currentTime = seekTime;
+            }
+        });
+
+        songTimeElement.innerText = "00:00/00:00";
+        let playImage = window.document.querySelector(".playPauseImage");
+
+        playImage.addEventListener("click", function(event){
+            if (currentSong.currentSrc !== ""){
+                if (currentSong.paused) {
+                    currentSong.play();
+                    playImage.src = "/images/pause.svg";
+                }
+                else{
+                    currentSong.pause();
+                    playImage.src = "/images/play.svg";
+                }
+            }
+        });
+
         songList.forEach(function(song){
             let songName = song.querySelector(".songName").innerText;
+            playImage.src = "/images/play.svg";
+
             song.addEventListener("click", function(event){
-                
                 let songPath = "/songs/" + songName;
-                
+                songInfoElement.innerText = songName;
                 songPath = encodeURI(songPath);
-                console.log(songPath);
-                console.log("current song : ", currentSong.currentSrc);
 
                 if (currentSong.currentSrc === ""){
                     console.log("song not there");
                     currentSong.src = songPath;
                     currentSong.volume = .1;
                     currentSong.play();
+                    playImage.src = "/images/pause.svg";
                 }
                 else {
                     let currentSongSplit = "/songs/" + currentSong.currentSrc.split("/songs/")[1];
@@ -72,19 +102,36 @@ async function main(){
                         if (currentSong.paused) {
                             currentSong.volume = .1;
                             currentSong.play();
+                            playImage.src = "/images/pause.svg";
                         }
                         else {
                             currentSong.volume = .1;
                             currentSong.pause();
+                            playImage.src = "/images/play.svg";
                         }
                     }
                     else {
                         currentSong.src = songPath;
                         currentSong.volume = .1;
                         currentSong.play();
+                        playImage.src = "/images/pause.svg";
                     }
                 }
             });
+        });
+
+        currentSong.src = "/songs/" + songList[0].querySelector(".songName").innerText;
+        currentSong.volume = .1;
+        songInfoElement.innerText = songList[0].querySelector(".songName").innerText;
+        playImage.src = "/images/play.svg";
+
+        currentSong.addEventListener("timeupdate", function(event){
+            let time = (currentSong.currentTime/currentSong.duration)*100;
+            seekCircleElement.style.left = time + "%";
+        });
+
+        currentSong.addEventListener("ended", function(event){
+            playImage.src = "/images/play.svg";
         });
     }
     catch(err){

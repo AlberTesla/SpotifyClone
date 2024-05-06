@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Drag Test</title>
+    <style>
+        div {
+            position : absolute;
+            height: 100px;
+            width: 100px;
+            background-color: green;
+        }
+
+        body {
+            background-color: aquamarine;
+            height : 100vh;
+            width : 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div></div>
+    <script>
+        let isMouseDown = false;
+        let offsetX = 0;
+        let offsetY = 0;
+        let box = document.querySelector("div");
+        box.addEventListener("mousedown", function(event){
+            isMouseDown = true;
+            offsetX = box.offsetLeft - event.x;
+            offsetY = box.offsetTop - event.y;
+        });
+
+        box.addEventListener("mouseup", function(event){
+            isMouseDown = false;
+        });
+
+        let body = window.document.querySelector("body");
+        body.addEventListener("mousemove", function(event){
+            if (isMouseDown){
+                let posX = event.x + offsetX;
+                let posY = event.y + offsetY;
+                box.style.left = posX + "px";
+                box.style.top = posY + "px";
+            }
+        });
+    </script>
+</body>
+</html>

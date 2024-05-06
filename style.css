@@ -305,6 +305,7 @@ body {
     width: 12px;
     position: absolute;
     z-index: 1000;
-    left: 0%;
+    left: calc(0% - 6px);
     top: -5px;
+    transition : left .1s ease-in;
 }

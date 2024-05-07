@@ -1,20 +1,29 @@
 let currentSong = new Audio();
 
-async function getSongs(){
+async function getSongs(folder){
     try{
-        let songslist = await fetch("http://127.0.0.1:5500/songs");
+        let songslist = await fetch(`http://127.0.0.1:5500/${folder}`);
         return songslist;
     }
     catch(err){
         console.log("songs not found");
-        return "song not found";
     }
 }
 
-async function main(){
+async function getFolders(){
+    try {
+        let foldersList = await fetch("http://127.0.0.1:5500/songs/");
+        return foldersList;
+    }
+    catch (err){
+        console.log("no folders exist");
+    }
+}
+
+async function main(folder){
     try{
         let songs = [];
-        let response = await getSongs();
+        let response = await getSongs(folder);
         let songtext = await response.text();
         let div = document.createElement("div");
         div.innerHTML = songtext;
@@ -57,13 +66,16 @@ async function main(){
         let nextElement = window.document.querySelector(".nextImage");
 
         previousElement.addEventListener("click", function(event){
-            let selectedSong =  decodeURI((currentSong.currentSrc).split("/songs/")[1]);
+            let selectedSong =  decodeURI((currentSong.currentSrc).split(folder)[1]);
+            selectedSong = `${folder + selectedSong}`;
             let i = -1;
 
             let previousSong = "";
 
             for (i = 0; i < songList.length; i++){
-                if (selectedSong === songList[i].querySelector(".songName").innerText){
+                let songPath = "songs/" + songList[i].querySelector(".songName").innerText;
+                console.log(songPath);
+                if (selectedSong === songPath){
                     if (i > 0){
                         previousSong = songList[i-1].querySelector(".songName").innerText;
                     }
@@ -72,6 +84,7 @@ async function main(){
             }
 
             if (i > 0){
+                console.log("/songs/" + previousSong);
                 currentSong.src = "/songs/" + previousSong;
                 currentSong.volume = volumeElement.value/100;
                 currentSong.play();
@@ -231,4 +244,73 @@ async function main(){
     }
 }
 
-main();
+// main();
+
+async function test(){
+    try {
+        let response = await getFolders();
+        let data = await response.text();
+        let div = window.document.createElement("div");
+        div.innerHTML = data;
+
+        let playList = div.querySelectorAll("ul li");
+
+        let cardContainerElement = document.querySelector(".cardContainer");
+
+        // Define an array to store promises
+        let promises = [];
+
+        playList.forEach(async function(folder){
+            let folderElement = folder.querySelector("a");
+            let folderName = folderElement.href.split("/songs/")[1];
+            if (folderName){
+                // Push the promise to the array
+                promises.push(
+                    fetch(`/songs/${folderName}/info.json`)
+                    .then(response => response.json())
+                    .then(folderData => {
+                        // Construct HTML string
+                        return `
+                        <div class="card relative">
+                            <div class="play">
+                                <img src="images/play-circle-02-stroke-rounded.svg" alt="">
+                            </div>
+                            <img class="bannerImage" src="/songs/${folderName}/${folderData.banner}.jfif" alt="">
+                            <h2>${folderData.title}</h2>
+                            <p>${folderData.description}</p>
+                        </div>
+                        `;
+                    })
+                    .catch(error => {
+                        console.error("Error fetching data:", error);
+                        return ''; // Return empty string if there's an error
+                    })
+                );
+            }
+        });
+
+        // After the loop, wait for all promises to resolve
+        Promise.all(promises)
+        .then(htmlStrings => {
+            // Join all HTML strings and set the HTML content
+            cardContainerElement.innerHTML = htmlStrings.join('');
+
+            let cardList = document.querySelectorAll(".card");
+
+            cardList.forEach(function(card){
+                card.addEventListener("click", function(event){
+                    let path = card.querySelector(".bannerImage").src;
+                    path = path.split("/songs/")[1];
+                    path = path.split("/")[0];
+                    console.log(`songs/${path}`);
+                    main(`songs/${path}`);
+                })
+            })
+        });
+    }
+    catch(err){
+        console.log("error : ", err);
+    }
+}
+
+test();

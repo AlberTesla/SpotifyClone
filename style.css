@@ -131,7 +131,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;
     /* margin-right: 15px; */
 }
 
@@ -297,6 +296,7 @@ body {
     position : relative;
     border: none;
     height: 5px;
+    margin-bottom : 10px;
     border-radius: 3px;
     background-color: rgb(255, 255, 255);
 }
@@ -321,6 +321,7 @@ body {
     width: 100%;
     bottom: 30px;
     display: flex;
+    padding-bottom : 20px;;
     flex-direction: row;
     margin-bottom: 7px;
 }
@@ -403,6 +404,7 @@ body {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        gap : 15px;
     }
 
     .songTime {

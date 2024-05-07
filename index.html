@@ -11,7 +11,8 @@
         <div class="left">
             <div class="home bg-gray rounded m1 p1">
                 <div class="logo">
-                    <img class="invert" src="images/logo.svg" alt="logo">
+                    <img style="width: 110px;" class="invert" src="images/logo.svg" alt="">
+                    <img src="images/close.svg" class="close invert" alt="">
                 </div>
                 <ul>
                     <li><img class="invert" src="images/home.svg" alt="home"><div>Home</div></li>
@@ -30,41 +31,88 @@
             </div>
         </div>
         <div class="right bg-gray rounded m1 scrollRight relative">
-            <div class="header">
-                <div class="nav">
-                    <img src="images/leftarrow.svg" class="invert" alt="">
-                    <img src="images/rightarrow.svg" class="invert" alt="">
+            <div class="adjust">
+                <div class="header">
+                    <div class="nav">
+                        <img src="images/hamburger.svg" class="hamburger invert " alt="">
+                        <img src="images/leftarrow.svg" class="invert" alt="">
+                        <img src="images/rightarrow.svg" class="invert" alt="">
+                    </div>
+                    <div class="buttons">
+                        <button class="signupBtn">Sign up</button>
+                        <button class="loginBtn">Log in</button>
+                    </div>
                 </div>
-                <div class="buttons">
-                    <button class="signupBtn">Sign up</button>
-                    <button class="loginBtn">Log in</button>
+                <div class="spotifyPlaylists">
+                    <h1>Spotify Playlists</h1>
+                    <div class="cardContainer">
+                        <div class="card relative">
+                            <div class="play">
+                                <img src="images/play-circle-02-stroke-rounded.svg" alt="">
+                            </div>
+                            <img src="images/ab67706f0000000227db07283bb128ac3d6615f2.jfif" alt="">
+                            <h2>Happy Hits</h2>
+                            <p>Hits to boost your mood and fill you with happiness!</p>
+                        </div>
+                        <div class="card relative">
+                            <div class="play">
+                                <img src="images/play-circle-02-stroke-rounded.svg" alt="">
+                            </div>
+                            <img src="images/ab67706f0000000227db07283bb128ac3d6615f2.jfif" alt="">
+                            <h2>Happy Hits</h2>
+                            <p>Hits to boost your mood and fill you with happiness!</p>
+                        </div>
+                        <div class="card relative">
+                            <div class="play">
+                                <img src="images/play-circle-02-stroke-rounded.svg" alt="">
+                            </div>
+                            <img src="images/ab67706f0000000227db07283bb128ac3d6615f2.jfif" alt="">
+                            <h2>Happy Hits</h2>
+                            <p>Hits to boost your mood and fill you with happiness!</p>
+                        </div>
+                        <div class="card relative">
+                            <div class="play">
+                                <img src="images/play-circle-02-stroke-rounded.svg" alt="">
+                            </div>
+                            <img src="images/ab67706f0000000227db07283bb128ac3d6615f2.jfif" alt="">
+                            <h2>Happy Hits</h2>
+                            <p>Hits to boost your mood and fill you with happiness!</p>
+                        </div>
+                        <div class="card relative">
+                            <div class="play">
+                                <img src="images/play-circle-02-stroke-rounded.svg" alt="">
+                            </div>
+                            <img src="images/ab67706f0000000227db07283bb128ac3d6615f2.jfif" alt="">
+                            <h2>Happy Hits</h2>
+                            <p>Hits to boost your mood and fill you with happiness!</p>
+                        </div>
+                        <div class="card relative">
+                            <div class="play">
+                                <img src="images/play-circle-02-stroke-rounded.svg" alt="">
+                            </div>
+                            <img src="images/ab67706f0000000227db07283bb128ac3d6615f2.jfif" alt="">
+                            <h2>Happy Hits</h2>
+                            <p>Hits to boost your mood and fill you with happiness!</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="spotifyPlaylists">
-                <h1>Spotify Playlists</h1>
-                <div class="cardContainer">
-                    <div class="card relative">
-                        <div class="play">
-                            <img src="images/play-circle-02-stroke-rounded.svg" alt="">
-                        </div>
-                        <img src="images/ab67706f0000000227db07283bb128ac3d6615f2.jfif" alt="">
-                        <h2>Happy Hits</h2>
-                        <p>Hits to boost your mood and fill you with happiness!</p>
+            <div class="playbarBox">
+                <div class="playbar invert">
+                    <div class="songInfo">Song Info</div>
+                    <div class="songButtons">
+                        <img class="previousImage" src="images/previous.svg" alt="">
+                        <img class="playPauseImage" src="images/play.svg" alt="">
+                        <img class="nextImage" src="images/next.svg" alt="">
+                    </div>
+                    <div class="timeVolume">
+                        <div class="songTime">Song Time</div>
+                        <img src="images/volume.svg" alt="">
+                        <input class="volumeRange" type="range">
                     </div>
                 </div>
-                <div class="playbarBox">
-                    <div class="playbar invert">
-                        <div class="songInfo">Song Info</div>
-                        <div class="songButtons">
-                            <img class="previousImage" src="images/previous.svg" alt="">
-                            <img class="playPauseImage" src="images/play.svg" alt="">
-                            <img class="nextImage" src="images/next.svg" alt="">
-                        </div>
-                        <div class="songTime">Song Time</div>
-                    </div>
-                    <div class="seekbar">
-                        <div class="seekCircle"></div>
-                    </div>
+                <div class="seekbar">
+                    <div class="seekCircle"></div>
                 </div>
             </div>
         </div>

@@ -52,7 +52,61 @@ async function main(){
         let songTimeElement = window.document.querySelector(".songTime");
         let seekBarElement = window.document.querySelector(".seekbar");
         let seekCircleElement = window.document.querySelector(".seekCircle");
+        let volumeElement = window.document.querySelector(".volumeRange");
+        let previousElement = window.document.querySelector(".previousImage");
+        let nextElement = window.document.querySelector(".nextImage");
 
+        previousElement.addEventListener("click", function(event){
+            let selectedSong =  decodeURI((currentSong.currentSrc).split("/songs/")[1]);
+            let i = -1;
+
+            let previousSong = "";
+
+            for (i = 0; i < songList.length; i++){
+                if (selectedSong === songList[i].querySelector(".songName").innerText){
+                    if (i > 0){
+                        previousSong = songList[i-1].querySelector(".songName").innerText;
+                    }
+                    break;
+                }
+            }
+
+            if (i > 0){
+                currentSong.src = "/songs/" + previousSong;
+                currentSong.volume = volumeElement.value/100;
+                currentSong.play();
+                songInfoElement.innerText = previousSong;
+                playImage.src = "/images/pause.svg";
+            }
+        });
+
+        nextElement.addEventListener("click", function(event){
+            let selectedSong =  decodeURI((currentSong.currentSrc).split("/songs/")[1]);
+            let i = -1
+
+            let nextSong = "";
+
+            for (i = 0; i < songList.length; i++){
+                if (selectedSong === songList[i].querySelector(".songName").innerText){
+                    if (i >= 0 && i < songList.length - 1 ){
+                        nextSong = songList[i+1].querySelector(".songName").innerText;
+                    }
+                    break;
+                }
+            }
+
+            if (i >= 0 &&i < songList.length - 1){
+                currentSong.src = "/songs/" + nextSong;
+                currentSong.volume = volumeElement.value/100;
+                currentSong.play();
+                songInfoElement.innerText = nextSong;
+                playImage.src = "/images/pause.svg";
+            }
+        });
+
+        volumeElement.addEventListener("change", function(event){
+            currentSong.volume = event.target.value/100;
+        });
 
         seekBarElement.addEventListener("click", function(event){
             let percent = (event.offsetX/seekBarElement.offsetWidth)*100;
@@ -92,7 +146,7 @@ async function main(){
                 if (currentSong.currentSrc === ""){
                     console.log("song not there");
                     currentSong.src = songPath;
-                    currentSong.volume = .1;
+                    currentSong.volume = volumeElement.value/100;
                     currentSong.play();
                     playImage.src = "/images/pause.svg";
                 }
@@ -100,19 +154,19 @@ async function main(){
                     let currentSongSplit = "/songs/" + currentSong.currentSrc.split("/songs/")[1];
                     if (currentSongSplit === songPath) {
                         if (currentSong.paused) {
-                            currentSong.volume = .1;
+                            currentSong.volume = volumeElement.value/100;
                             currentSong.play();
                             playImage.src = "/images/pause.svg";
                         }
                         else {
-                            currentSong.volume = .1;
+                            currentSong.volume = volumeElement.value/100;
                             currentSong.pause();
                             playImage.src = "/images/play.svg";
                         }
                     }
                     else {
                         currentSong.src = songPath;
-                        currentSong.volume = .1;
+                        currentSong.volume = volumeElement.value/100;
                         currentSong.play();
                         playImage.src = "/images/pause.svg";
                     }
@@ -121,18 +175,56 @@ async function main(){
         });
 
         currentSong.src = "/songs/" + songList[0].querySelector(".songName").innerText;
-        currentSong.volume = .1;
+        currentSong.volume = volumeElement.value/100;
         songInfoElement.innerText = songList[0].querySelector(".songName").innerText;
         playImage.src = "/images/play.svg";
 
         currentSong.addEventListener("timeupdate", function(event){
             let time = (currentSong.currentTime/currentSong.duration)*100;
+
+            let milliSeconds = Math.trunc(currentSong.currentTime*1000);
+
+            let durationMilliSeconds = Math.trunc(currentSong.duration*1000);
+            
+            let durationHours = Math.trunc(durationMilliSeconds/3600000);
+            let remainingDuration = durationMilliSeconds%3600000;
+
+            let durationMinutes = Math.trunc(remainingDuration/60000);
+            remainingDuration = remainingDuration%60000;
+
+            let durationSeconds = Math.trunc(remainingDuration/1000);
+            remainingDuration = remainingDuration%1000;
+
+            let hours = Math.trunc(milliSeconds/3600000);
+            let remainingSeconds = milliSeconds%3600000;
+
+            let minutes = Math.trunc(remainingSeconds/60000);
+            remainingSeconds = remainingSeconds%60000;
+
+            let seconds = Math.trunc(remainingSeconds/1000);
+            remainingSeconds = remainingSeconds%1000;
+
+            // console.log("hr : ", hours, ", min : ", minutes, ", sec : ", seconds);
+
+            songTimeElement.innerText = String(minutes).padStart(2, '0')  + ":" + String(seconds).padStart(2, '0')
+            + "/" + String(durationMinutes).padStart(2, '0')  + ":" + String(durationSeconds).padStart(2, '0');
+
             seekCircleElement.style.left = time + "%";
         });
 
         currentSong.addEventListener("ended", function(event){
             playImage.src = "/images/play.svg";
         });
+
+        let hamburger = window.document.querySelector(".hamburger");
+        hamburger.addEventListener("click", function(event){
+            document.querySelector(".left").style.left = "0";
+        })
+
+        let close = window.document.querySelector(".close");
+        close.addEventListener("click", function(event){
+            document.querySelector(".left").style.left = "-150%";
+        })
     }
     catch(err){
         console.log(err);

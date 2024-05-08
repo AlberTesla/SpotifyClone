@@ -4,7 +4,8 @@ let lastNextCallback = null;
 
 async function getSongs(folder){
     try{
-        let songslist = await fetch(`http://127.0.0.1:5500/${folder}`);
+        console.log("get songs");
+        let songslist = await fetch(`/${folder}`);
         return songslist;
     }
     catch(err){
@@ -14,7 +15,8 @@ async function getSongs(folder){
 
 async function getFolders(){
     try {
-        let foldersList = await fetch("http://127.0.0.1:5500/songs/");
+        console.log("get folders");
+        let foldersList = await fetch("/songs/");
         return foldersList;
     }
     catch (err){
@@ -73,8 +75,6 @@ async function main(folder){
         }
 
         lastPrevCallback = function(event){
-
-            console.log("calling prev");
             //compare with path name with the song name
             let selectedSong =  decodeURI((currentSong.currentSrc).split("/songs/")[1]);
             let i = -1;
@@ -100,8 +100,6 @@ async function main(folder){
         }
 
         lastNextCallback = function(event){
-            console.log("calling next");
-
             //compare with path name with the song name
             let selectedSong =  decodeURI((currentSong.currentSrc).split("/songs/")[1]);
             let i = -1;
@@ -129,17 +127,6 @@ async function main(folder){
         previousElement.addEventListener("click", lastPrevCallback);
         nextElement.addEventListener("click", lastNextCallback);
 
-        // seekBarElement.addEventListener("click", function(event){
-        //     let percent = (event.offsetX/seekBarElement.offsetWidth)*100;
-        //     seekCircleElement.style.left = percent + "%";
-
-        //     if (currentSong.currentSrc !== ""){
-        //         let seekTime = currentSong.duration*percent/100;
-        //         currentSong.currentTime = seekTime;
-        //     }
-        // });
-
-        // songTimeElement.innerText = "00:00/00:00";
         let playImage = window.document.querySelector(".playPauseImage");
 
         songList.forEach(function(song){
@@ -281,21 +268,37 @@ function bindEvents(){
 async function test(){
     try {
         let response = await getFolders();
+        console.log(response);
         let data = await response.text();
+        console.log(data);
         let div = window.document.createElement("div");
         div.innerHTML = data;
 
-        let playList = div.querySelectorAll("ul li");
+        let playList = div.querySelectorAll("a");
+
+        playList.forEach(function(song){
+            if (song.href.includes("/songs/")) {
+                console.log(song);
+            }
+        });
+
+        console.log(playList);
 
         let cardContainerElement = document.querySelector(".cardContainer");
 
         // Define an array to store promises
         let promises = [];
 
+        console.log("before promises");
+
         playList.forEach(async function(folder){
-            let folderElement = folder.querySelector("a");
+            if (folder.href.includes("/songs/")) {
+            // let folderElement = folder.querySelector("a");
             let folderName = folderElement.href.split("/songs/")[1];
-            if (folderName){
+
+            // console.log(folderName);
+            if (folderName && !folderName.includes(".htaccess")){
+                console.log("inside the check");
                 // Push the promise to the array
                 promises.push(
                     fetch(`/songs/${folderName}/info.json`)
@@ -319,7 +322,10 @@ async function test(){
                     })
                 );
             }
+        }
         });
+
+        console.log("before promises");
 
         // After the loop, wait for all promises to resolve
         Promise.all(promises)
@@ -346,3 +352,5 @@ async function test(){
 }
 
 test();
+
+console.log("hello world");

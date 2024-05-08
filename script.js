@@ -1,4 +1,6 @@
 let currentSong = new Audio();
+let lastPrevCallback = null;
+let lastNextCallback = null;
 
 async function getSongs(folder){
     try{
@@ -43,7 +45,7 @@ async function main(folder){
             `<li>
                 <img class="invert" src="images/songicon.svg" alt="">
                 <div class="songDetails">
-                    <div class="songName">${(song.split("/songs/")[1]).replaceAll("%20", " ")}</div>
+                    <div data-folder="${folder.split("/")[1]}" class="songName">${decodeURI(song.split(folder + "/")[1])}</div>
                     <div class="songArtist">AlberTesla</div>
                 </div>
                 <div class="playSongList">
@@ -54,27 +56,32 @@ async function main(folder){
         });
 
         cardList.innerHTML = string;
-
         let songList = cardList.querySelectorAll("li");
-        
         let songInfoElement = window.document.querySelector(".songInfo");
-        let songTimeElement = window.document.querySelector(".songTime");
-        let seekBarElement = window.document.querySelector(".seekbar");
-        let seekCircleElement = window.document.querySelector(".seekCircle");
+        // let seekBarElement = window.document.querySelector(".seekbar");
+        // let seekCircleElement = window.document.querySelector(".seekCircle");
         let volumeElement = window.document.querySelector(".volumeRange");
         let previousElement = window.document.querySelector(".previousImage");
         let nextElement = window.document.querySelector(".nextImage");
 
-        previousElement.addEventListener("click", function(event){
-            let selectedSong =  decodeURI((currentSong.currentSrc).split(folder)[1]);
-            selectedSong = `${folder + selectedSong}`;
+        if (lastPrevCallback){
+            previousElement.removeEventListener("click", lastPrevCallback);
+        }
+        
+        if (lastNextCallback){
+            nextElement.removeEventListener("click", lastNextCallback);
+        }
+
+        lastPrevCallback = function(event){
+
+            console.log("calling prev");
+            //compare with path name with the song name
+            let selectedSong =  decodeURI((currentSong.currentSrc).split("/songs/")[1]);
             let i = -1;
 
             let previousSong = "";
-
             for (i = 0; i < songList.length; i++){
-                let songPath = "songs/" + songList[i].querySelector(".songName").innerText;
-                console.log(songPath);
+                let songPath = folder.split("songs/")[1] + "/" + songList[i].querySelector(".songName").innerText;
                 if (selectedSong === songPath){
                     if (i > 0){
                         previousSong = songList[i-1].querySelector(".songName").innerText;
@@ -84,87 +91,74 @@ async function main(folder){
             }
 
             if (i > 0){
-                console.log("/songs/" + previousSong);
-                currentSong.src = "/songs/" + previousSong;
+                currentSong.src = folder + "/" + previousSong;
                 currentSong.volume = volumeElement.value/100;
                 currentSong.play();
                 songInfoElement.innerText = previousSong;
                 playImage.src = "/images/pause.svg";
             }
-        });
+        }
 
-        nextElement.addEventListener("click", function(event){
+        lastNextCallback = function(event){
+            console.log("calling next");
+
+            //compare with path name with the song name
             let selectedSong =  decodeURI((currentSong.currentSrc).split("/songs/")[1]);
-            let i = -1
+            let i = -1;
 
-            let nextSong = "";
-
+            let previousSong = "";
             for (i = 0; i < songList.length; i++){
-                if (selectedSong === songList[i].querySelector(".songName").innerText){
-                    if (i >= 0 && i < songList.length - 1 ){
-                        nextSong = songList[i+1].querySelector(".songName").innerText;
+                let songPath = folder.split("songs/")[1] + "/" + songList[i].querySelector(".songName").innerText;
+                if (selectedSong === songPath){
+                    if (i >= 0 && i < songList.length - 1){
+                        previousSong = songList[i+1].querySelector(".songName").innerText;
                     }
                     break;
                 }
             }
 
-            if (i >= 0 &&i < songList.length - 1){
-                currentSong.src = "/songs/" + nextSong;
+            if (i >= 0 && i < songList.length - 1){
+                currentSong.src = folder + "/" + previousSong;
                 currentSong.volume = volumeElement.value/100;
                 currentSong.play();
-                songInfoElement.innerText = nextSong;
+                songInfoElement.innerText = previousSong;
                 playImage.src = "/images/pause.svg";
             }
-        });
+        }
 
-        volumeElement.addEventListener("change", function(event){
-            currentSong.volume = event.target.value/100;
-        });
+        previousElement.addEventListener("click", lastPrevCallback);
+        nextElement.addEventListener("click", lastNextCallback);
 
-        seekBarElement.addEventListener("click", function(event){
-            let percent = (event.offsetX/seekBarElement.offsetWidth)*100;
-            seekCircleElement.style.left = percent + "%";
+        // seekBarElement.addEventListener("click", function(event){
+        //     let percent = (event.offsetX/seekBarElement.offsetWidth)*100;
+        //     seekCircleElement.style.left = percent + "%";
 
-            if (currentSong.currentSrc !== ""){
-                let seekTime = currentSong.duration*percent/100;
-                currentSong.currentTime = seekTime;
-            }
-        });
+        //     if (currentSong.currentSrc !== ""){
+        //         let seekTime = currentSong.duration*percent/100;
+        //         currentSong.currentTime = seekTime;
+        //     }
+        // });
 
-        songTimeElement.innerText = "00:00/00:00";
+        // songTimeElement.innerText = "00:00/00:00";
         let playImage = window.document.querySelector(".playPauseImage");
-
-        playImage.addEventListener("click", function(event){
-            if (currentSong.currentSrc !== ""){
-                if (currentSong.paused) {
-                    currentSong.play();
-                    playImage.src = "/images/pause.svg";
-                }
-                else{
-                    currentSong.pause();
-                    playImage.src = "/images/play.svg";
-                }
-            }
-        });
 
         songList.forEach(function(song){
             let songName = song.querySelector(".songName").innerText;
             playImage.src = "/images/play.svg";
 
             song.addEventListener("click", function(event){
-                let songPath = "/songs/" + songName;
+                let songPath = folder + "/" + songName;
+                
                 songInfoElement.innerText = songName;
                 songPath = encodeURI(songPath);
-
                 if (currentSong.currentSrc === ""){
-                    console.log("song not there");
                     currentSong.src = songPath;
                     currentSong.volume = volumeElement.value/100;
                     currentSong.play();
                     playImage.src = "/images/pause.svg";
                 }
                 else {
-                    let currentSongSplit = "/songs/" + currentSong.currentSrc.split("/songs/")[1];
+                    let currentSongSplit = "songs/" + currentSong.currentSrc.split("/songs/")[1];
                     if (currentSongSplit === songPath) {
                         if (currentSong.paused) {
                             currentSong.volume = volumeElement.value/100;
@@ -184,67 +178,105 @@ async function main(folder){
                         playImage.src = "/images/pause.svg";
                     }
                 }
+                lastSong = decodeURI(currentSong.src.split(folder + "/")[1]);
             });
         });
 
-        currentSong.src = "/songs/" + songList[0].querySelector(".songName").innerText;
+        currentSong.src = folder + "/" + songList[0].querySelector(".songName").innerText;
         currentSong.volume = volumeElement.value/100;
         songInfoElement.innerText = songList[0].querySelector(".songName").innerText;
-        playImage.src = "/images/play.svg";
-
-        currentSong.addEventListener("timeupdate", function(event){
-            let time = (currentSong.currentTime/currentSong.duration)*100;
-
-            let milliSeconds = Math.trunc(currentSong.currentTime*1000);
-
-            let durationMilliSeconds = Math.trunc(currentSong.duration*1000);
-            
-            let durationHours = Math.trunc(durationMilliSeconds/3600000);
-            let remainingDuration = durationMilliSeconds%3600000;
-
-            let durationMinutes = Math.trunc(remainingDuration/60000);
-            remainingDuration = remainingDuration%60000;
-
-            let durationSeconds = Math.trunc(remainingDuration/1000);
-            remainingDuration = remainingDuration%1000;
-
-            let hours = Math.trunc(milliSeconds/3600000);
-            let remainingSeconds = milliSeconds%3600000;
-
-            let minutes = Math.trunc(remainingSeconds/60000);
-            remainingSeconds = remainingSeconds%60000;
-
-            let seconds = Math.trunc(remainingSeconds/1000);
-            remainingSeconds = remainingSeconds%1000;
-
-            // console.log("hr : ", hours, ", min : ", minutes, ", sec : ", seconds);
-
-            songTimeElement.innerText = String(minutes).padStart(2, '0')  + ":" + String(seconds).padStart(2, '0')
-            + "/" + String(durationMinutes).padStart(2, '0')  + ":" + String(durationSeconds).padStart(2, '0');
-
-            seekCircleElement.style.left = time + "%";
-        });
-
-        currentSong.addEventListener("ended", function(event){
-            playImage.src = "/images/play.svg";
-        });
-
-        let hamburger = window.document.querySelector(".hamburger");
-        hamburger.addEventListener("click", function(event){
-            document.querySelector(".left").style.left = "0";
-        })
-
-        let close = window.document.querySelector(".close");
-        close.addEventListener("click", function(event){
-            document.querySelector(".left").style.left = "-150%";
-        })
+        playImage.src = "/images/pause.svg";
+        currentSong.play();
+        lastFolder = folder.split("songs/")[1];
+        lastSong = currentSong.src;
     }
     catch(err){
         console.log(err);
     }
 }
 
-// main();
+function bindEvents(){
+    let close = window.document.querySelector(".close");
+    close.addEventListener("click", function(event){
+        console.log("this is pressed");
+        document.querySelector(".left").style.left = "-150%";
+    });
+
+    let hamburger = window.document.querySelector(".hamburger");
+    hamburger.addEventListener("click", function(event){
+        document.querySelector(".left").style.left = "0";
+    });
+
+    let songTimeElement = window.document.querySelector(".songTime");
+    let seekCircleElement = window.document.querySelector(".seekCircle");
+    let playImage = window.document.querySelector(".playPauseImage");
+    let volumeElement = window.document.querySelector(".volumeRange");
+
+    volumeElement.addEventListener("change", function(event){
+        currentSong.volume = event.target.value/100;
+    });
+
+    currentSong.addEventListener("timeupdate", function(event){
+        let time = (currentSong.currentTime/currentSong.duration)*100;
+
+        let milliSeconds = Math.trunc(currentSong.currentTime*1000);
+
+        let durationMilliSeconds = Math.trunc(currentSong.duration*1000);
+        
+        let durationHours = Math.trunc(durationMilliSeconds/3600000);
+        let remainingDuration = durationMilliSeconds%3600000;
+
+        let durationMinutes = Math.trunc(remainingDuration/60000);
+        remainingDuration = remainingDuration%60000;
+
+        let durationSeconds = Math.trunc(remainingDuration/1000);
+        remainingDuration = remainingDuration%1000;
+
+        let hours = Math.trunc(milliSeconds/3600000);
+        let remainingSeconds = milliSeconds%3600000;
+
+        let minutes = Math.trunc(remainingSeconds/60000);
+        remainingSeconds = remainingSeconds%60000;
+
+        let seconds = Math.trunc(remainingSeconds/1000);
+        remainingSeconds = remainingSeconds%1000;
+
+        // console.log("hr : ", hours, ", min : ", minutes, ", sec : ", seconds);
+        songTimeElement.innerText = String(minutes).padStart(2, '0')  + ":" + String(seconds).padStart(2, '0')
+        + "/" + String(durationMinutes).padStart(2, '0')  + ":" + String(durationSeconds).padStart(2, '0');
+
+        seekCircleElement.style.left = time + "%";
+    });
+
+    songTimeElement.innerText = "00:00/00:00";
+        playImage.addEventListener("click", function(event){
+            if (currentSong.currentSrc !== ""){
+                if (currentSong.paused) {
+                    currentSong.play();
+                    playImage.src = "/images/pause.svg";
+                }
+                else{
+                    currentSong.pause();
+                    playImage.src = "/images/play.svg";
+                }
+            }
+        });
+
+        currentSong.addEventListener("ended", function(event){
+        playImage.src = "/images/play.svg";
+    });
+
+    let seekBarElement = window.document.querySelector(".seekbar");
+    seekBarElement.addEventListener("click", function(event){
+        let percent = (event.offsetX/seekBarElement.offsetWidth)*100;
+        seekCircleElement.style.left = percent + "%";
+
+        if (currentSong.currentSrc !== ""){
+            let seekTime = currentSong.duration*percent/100;
+            currentSong.currentTime = seekTime;
+        }
+    });
+}
 
 async function test(){
     try {
@@ -302,10 +334,10 @@ async function test(){
                     let path = card.querySelector(".bannerImage").src;
                     path = path.split("/songs/")[1];
                     path = path.split("/")[0];
-                    console.log(`songs/${path}`);
                     main(`songs/${path}`);
                 })
             })
+            bindEvents();
         });
     }
     catch(err){
